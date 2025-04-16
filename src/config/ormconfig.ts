@@ -13,8 +13,6 @@ const dataSourceOptions: DataSourceOptions = {
   synchronize: false,
 };
 
-console.log('ENVIRONMENT', ENVIRONMENT);
-
 module.exports = {
   dataSource: new DataSource(dataSourceOptions),
 } as {
