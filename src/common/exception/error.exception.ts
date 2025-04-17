@@ -14,7 +14,7 @@ export class ErrorException extends Error {
 
   returnError() {
     return {
-      result: false,
+      status: 'error',
       message: this.message,
       errorCode: this.errorCode,
       data: this.data,

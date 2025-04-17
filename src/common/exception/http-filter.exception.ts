@@ -1,6 +1,14 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  BadRequestException,
+  Catch,
+  ExceptionFilter,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ErrorException } from './error.exception';
 import { Response } from 'express';
+import { ERROR_CODE } from '../enum/error-code.enum';
 
 @Catch()
 export class HttpFilterException implements ExceptionFilter {
@@ -14,15 +22,30 @@ export class HttpFilterException implements ExceptionFilter {
 
     if (exception instanceof ErrorException) {
       errorException = exception;
+    } else if (exception instanceof NotFoundException) {
+      errorException = new ErrorException(
+        ERROR_CODE.PATH_NOT_FOUND,
+        'Path not found',
+      );
+    } else if (exception instanceof UnauthorizedException) {
+      errorException = new ErrorException(
+        ERROR_CODE.UNAUTHORIZED,
+        'Unauthorized',
+      );
+    } else if (exception instanceof BadRequestException) {
+      errorException = new ErrorException(
+        ERROR_CODE.INVALID_JSON_FORMAT,
+        'Invalid json format',
+      );
     } else {
       errorException = new ErrorException(
-        'AN_UNKNOWN_ERROR|400',
-        'An unknown error|400',
+        ERROR_CODE.AN_UNKNOWN_ERROR,
+        'An unknown error',
       );
     }
 
     response
       .status(errorException.httpStatusCode)
-      .json(exception.returnError());
+      .json(errorException.returnError());
   }
 }
