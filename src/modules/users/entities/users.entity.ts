@@ -25,8 +25,4 @@ export class UserEntity {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt: Date;
-
-  @Column()
-  @Exclude()
-  salt: string;
 }
