@@ -41,7 +41,6 @@ export class UserController {
     @Body() dto: ChangePasswordDto,
     @Req() req: CustomRequest,
   ) {
-    console.log('req.jwtPayload', req.jwtPayload);
     await this.userService.changePassword(req.jwtPayload.id, dto);
     return SuccessResponse.call(null, 'Change password successfully');
   }

@@ -30,7 +30,6 @@ export class UserGuard implements CanActivate {
 
       return true;
     } catch (e) {
-      console.log(e);
       throw new UnauthorizedException(e);
     }
   }

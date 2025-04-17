@@ -77,12 +77,7 @@ export class UserService {
     if (!user) {
       throw new ErrorException(USER_ERROR_ENUM.NOT_FOUND, 'User not found');
     }
-    console.log(
-      'check',
-      await bcrypt.compare(dto.currentPassword, user.password),
-      user,
-      dto,
-    );
+
     if (!(await bcrypt.compare(dto.currentPassword, user.password))) {
       throw new ErrorException(
         USER_ERROR_ENUM.INVALID_CREDENTIALS,
