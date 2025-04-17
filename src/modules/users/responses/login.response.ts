@@ -3,8 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 type UserLoginResponse = {
   id: number;
   email: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export class LoginResponse {

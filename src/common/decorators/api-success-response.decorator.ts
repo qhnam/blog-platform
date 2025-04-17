@@ -1,9 +1,8 @@
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { HttpStatus } from '@nestjs/common';
-import { SuccessResponse } from 'src/common/response/success.response';
 
-export const ApiSuccessResponse = (model?: any) => {
+export const ApiSuccessResponse = <TModel extends Type<any>>(model: TModel) => {
   return applyDecorators(
     ApiExtraModels(model),
     ApiOkResponse({

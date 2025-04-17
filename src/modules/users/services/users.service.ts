@@ -8,6 +8,9 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { UserEntity } from '../entities/users.entity';
 import { USER_ERROR_ENUM } from '../enums/user-error.enum';
 import { AuthService } from './auth.service';
+import { ChangePasswordDto } from '../dtos/change-password.dto';
+import { LoginResponse } from '../responses/login.response';
+import { RegisterResponse } from '../responses/register.response';
 
 @Injectable()
 export class UserService {
@@ -17,7 +20,7 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<RegisterResponse> {
     if (dto.password !== dto.confirmPassword) {
       throw new ErrorException(
         USER_ERROR_ENUM.CONFIRM_PASSWORD_NOT_MATCH,
@@ -49,7 +52,7 @@ export class UserService {
     return safeUser;
   }
 
-  async login(dto: LoginUserDto) {
+  async login(dto: LoginUserDto): Promise<LoginResponse> {
     const user = await this.userRepo.findOne({ where: { email: dto.email } });
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new ErrorException(
@@ -66,5 +69,35 @@ export class UserService {
       refreshToken,
       user: safeUser,
     };
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new ErrorException(USER_ERROR_ENUM.NOT_FOUND, 'User not found');
+    }
+    console.log(
+      'check',
+      await bcrypt.compare(dto.currentPassword, user.password),
+      user,
+      dto,
+    );
+    if (!(await bcrypt.compare(dto.currentPassword, user.password))) {
+      throw new ErrorException(
+        USER_ERROR_ENUM.INVALID_CREDENTIALS,
+        'Current password is incorrect',
+      );
+    }
+
+    if (dto.newPassword !== dto.confirmNewPassword) {
+      throw new ErrorException(
+        USER_ERROR_ENUM.INVALID_CREDENTIALS,
+        'New password and confirm password do not match',
+      );
+    }
+
+    user.password = await bcrypt.hash(dto.newPassword, 10);
+    await this.userRepo.save(user);
   }
 }

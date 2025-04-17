@@ -7,7 +7,7 @@ import { ENVIRONMENT } from 'src/common/const/environment';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
   public generateAccessToken(user: UserEntity) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, id: user.id };
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: ENVIRONMENT.JWT_LIFE_TIME_ACCESS,
