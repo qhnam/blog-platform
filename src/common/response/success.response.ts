@@ -1,10 +1,17 @@
+import { HttpStatus } from '@nestjs/common';
+
 export class SuccessResponse {
-  static call(data: any = null, message = 'Successfully') {
+  static call(
+    data: any = null,
+    message = 'Successfully',
+    statusCode = HttpStatus.OK,
+  ) {
     return {
-      result: true,
+      status: 'success',
       message,
       data,
       errorCode: null,
+      statusCode,
     };
   }
 }

@@ -4,31 +4,18 @@ import bcrypt from 'bcryptjs';
 import { ErrorException } from 'src/common/exception/error.exception';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { LoginUserDto } from '../dtos/login-user.dto';
 import { UserEntity } from '../entities/users.entity';
 import { USER_ERROR_ENUM } from '../enums/user-error.enum';
-import { LoginUserDto } from '../dtos/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import { ENVIRONMENT } from 'src/common/const/environment';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
-    private jwtService: JwtService,
+    private readonly authService: AuthService,
   ) {}
-
-  private generateAccessToken(user: UserEntity) {
-    const payload = { email: user.email, sub: user.id };
-
-    const accessToken = this.jwtService.signAsync(payload, {
-      expiresIn: ENVIRONMENT.JWT_LIFE_TIME_ACCESS,
-    });
-
-    // const refreshToken =
-
-    return accessToken;
-  }
 
   async createUser(dto: CreateUserDto) {
     if (dto.password !== dto.confirmPassword) {
@@ -49,7 +36,7 @@ export class UserService {
       );
     }
 
-    const hashedPassword = bcrypt.hashSync(dto.password, 10);
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const newUser = this.userRepo.create({
       ...dto,
@@ -64,11 +51,20 @@ export class UserService {
 
   async login(dto: LoginUserDto) {
     const user = await this.userRepo.findOne({ where: { email: dto.email } });
-    if (!user || !bcrypt.compareSync(dto.password, user.password)) {
+    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new ErrorException(
         USER_ERROR_ENUM.INVALID_CREDENTIALS,
         'Invalid credentials',
       );
     }
+
+    const { password: _, ...safeUser } = user;
+    const { accessToken, refreshToken } =
+      this.authService.generateAccessToken(user);
+    return {
+      accessToken,
+      refreshToken,
+      user: safeUser,
+    };
   }
 }
