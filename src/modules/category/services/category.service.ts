@@ -10,12 +10,14 @@ import { UpdateCategoryDto } from '../dtos/update-category.dto';
 import { BaseFilterDto } from 'src/common/dtos/base-filter.dto';
 import { BlogShareService } from 'src/modules/blog/services/blog-share.service';
 import { CATEGORY_ERROR_ENUM } from '../enums/category-error.enum';
+import { CategoryShareService } from './category-share.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoryRepo: Repository<CategoryEntity>,
+    private readonly categoryShareService: CategoryShareService,
     private readonly blogShareService: BlogShareService,
   ) {}
 
@@ -23,8 +25,9 @@ export class CategoryService {
     const slug = slugify(dto.title, {
       lower: true,
     });
-    const category = await this.categoryRepo.findOne({
-      where: { slug: slug },
+
+    const category = await this.categoryShareService.findOneByCondition({
+      slug,
     });
 
     if (category) {
@@ -42,7 +45,9 @@ export class CategoryService {
   }
 
   async updateCategory(id: number, dto: UpdateCategoryDto) {
-    const category = await this.categoryRepo.findOne({ where: { id } });
+    const category = await this.categoryShareService.findOneByCondition({
+      id,
+    });
 
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
@@ -71,7 +76,10 @@ export class CategoryService {
   }
 
   async findOne(id: number) {
-    const category = await this.categoryRepo.findOne({ where: { id } });
+    const category = await this.categoryShareService.findOneByCondition({
+      id,
+    });
+
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
     }
@@ -80,7 +88,10 @@ export class CategoryService {
   }
 
   async findOneBySlug(slug: string) {
-    const category = await this.categoryRepo.findOne({ where: { slug } });
+    const category = await this.categoryShareService.findOneByCondition({
+      slug,
+    });
+
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
     }
@@ -109,7 +120,10 @@ export class CategoryService {
   }
 
   async deleteCategory(id: number) {
-    const category = await this.categoryRepo.findOne({ where: { id } });
+    const category = await this.categoryShareService.findOneByCondition({
+      id,
+    });
+
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
     }
