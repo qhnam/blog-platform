@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/users/users.modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ENVIRONMENT } from './common/const/environment';
+import { CategoryModule } from './modules/category/category.module';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,7 +20,11 @@ import { ENVIRONMENT } from './common/const/environment';
       entities: ['dist/modules/**/entities/*.js'],
       synchronize: false,
     }),
+    JwtModule.register({
+      global: true,
+    }),
     UserModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
