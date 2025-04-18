@@ -1,0 +1,3 @@
+export enum CATEGORY_ERROR_ENUM {
+  ALREADY_USE = 'ALREADY_USE',
+}

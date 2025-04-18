@@ -22,6 +22,8 @@ export class BlogEntity {
   userId: number;
 
   @Column({ name: 'category_id' })
+  categoryId: number;
+
   @Column({ name: 'title' })
   title: string;
 

@@ -43,10 +43,10 @@ export class CategoryController {
     );
   }
 
-  @Get(':slug')
-  async findOneCategory(@Param('slug') slug: string) {
+  @Get(':id')
+  async findOneCategory(@Param('id') id: number) {
     return SuccessResponse.call(
-      await this.categoryService.findOne(slug),
+      await this.categoryService.findOne(id),
       'Get detail category successfully',
     );
   }

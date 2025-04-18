@@ -8,12 +8,15 @@ import { ERROR_CODE } from 'src/common/enum/error-code.enum';
 import slugify from 'slugify';
 import { UpdateCategoryDto } from '../dtos/update-category.dto';
 import { BaseFilterDto } from 'src/common/dtos/base-filter.dto';
+import { BlogShareService } from 'src/modules/blog/services/blog-share.service';
+import { CATEGORY_ERROR_ENUM } from '../enums/category-error.enum';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoryRepo: Repository<CategoryEntity>,
+    private readonly blogShareService: BlogShareService,
   ) {}
 
   async createCategory(dto: CreateCategoryDto) {
@@ -67,7 +70,16 @@ export class CategoryService {
     return await this.categoryRepo.save(category);
   }
 
-  async findOne(slug: string) {
+  async findOne(id: number) {
+    const category = await this.categoryRepo.findOne({ where: { id } });
+    if (!category) {
+      throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
+    }
+
+    return category;
+  }
+
+  async findOneBySlug(slug: string) {
     const category = await this.categoryRepo.findOne({ where: { slug } });
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
@@ -94,5 +106,21 @@ export class CategoryService {
       .getManyAndCount();
 
     return { data, total };
+  }
+
+  async deleteCategory(id: number) {
+    const category = await this.categoryRepo.findOne({ where: { id } });
+    if (!category) {
+      throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
+    }
+
+    if (await this.blogShareService.isCategoryInUse(id)) {
+      throw new ErrorException(
+        CATEGORY_ERROR_ENUM.ALREADY_USE,
+        'Category used in blog',
+      );
+    }
+
+    await this.categoryRepo.delete(id);
   }
 }

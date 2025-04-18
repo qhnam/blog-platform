@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ENVIRONMENT } from './common/const/environment';
 import { CategoryModule } from './modules/category/category.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { BlogController } from './modules/blog/controllers/blog.controller';
+import { BlogModule } from './modules/blog/blog.module';
+import { CommonModule } from './modules/common.module';
 
 @Module({
   imports: [
@@ -23,8 +26,10 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
     }),
+    CommonModule,
     UserModule,
     CategoryModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
