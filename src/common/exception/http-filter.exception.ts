@@ -43,7 +43,7 @@ export class HttpFilterException implements ExceptionFilter {
         'An unknown error',
       );
     }
-
+    console.log('e', exception);
     response
       .status(errorException.httpStatusCode)
       .json(errorException.returnError());

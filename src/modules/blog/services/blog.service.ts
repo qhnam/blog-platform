@@ -20,6 +20,7 @@ export class BlogService {
     const category = await this.categoryShareService.findOneByCondition({
       id: dto.categoryId,
     });
+
     if (!category) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Category not found');
     }
@@ -28,7 +29,31 @@ export class BlogService {
     blog.userId = userId;
     blog.categoryId = dto.categoryId;
     blog.title = dto.title;
-    blog.content = dto.content;
+    blog.text = dto.text;
+
+    const blogResult = await this.blogRepository.save(blog);
+    blogResult.slug = `${slugify(dto.title, { lower: true })}-${blogResult.id}`;
+
+    await this.blogRepository.save(blogResult);
+
+    return blogResult;
+  }
+
+  async updateBlog(userId: number, id: number, dto: CreateBlogDto) {
+    const blog = await this.blogRepository.findOne({
+      where: {
+        id,
+        userId,
+      },
+    });
+
+    if (!blog) {
+      throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Blog not found');
+    }
+
+    blog.categoryId = dto.categoryId;
+    blog.title = dto.title;
+    blog.text = dto.text;
 
     const blogResult = await this.blogRepository.save(blog);
     blogResult.slug = `${slugify(dto.title, { lower: true })}-${blogResult.id}`;

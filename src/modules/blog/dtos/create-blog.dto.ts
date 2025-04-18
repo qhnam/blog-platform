@@ -13,5 +13,5 @@ export class CreateBlogDto {
 
   @ApiProperty({})
   @IsString()
-  content: string;
+  text: string;
 }
