@@ -8,7 +8,7 @@ import { ENVIRONMENT } from './common/const/environment';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mariadb',
+      type: 'mysql',
       host: ENVIRONMENT.DATABASE_HOST,
       port: Number(ENVIRONMENT.DATABASE_PORT),
       username: ENVIRONMENT.DATABASE_USERNAME,

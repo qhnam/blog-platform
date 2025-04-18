@@ -2,7 +2,7 @@ import { ENVIRONMENT } from 'src/common/const/environment';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const dataSourceOptions: DataSourceOptions = {
-  type: 'mariadb',
+  type: 'mysql',
   host: ENVIRONMENT.DATABASE_HOST,
   port: Number(ENVIRONMENT.DATABASE_PORT),
   username: ENVIRONMENT.DATABASE_USERNAME,
