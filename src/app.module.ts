@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './modules/users/users.modules';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ENVIRONMENT } from './common/const/environment';
-import { CategoryModule } from './modules/category/category.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { BlogController } from './modules/blog/controllers/blog.controller';
 import { BlogModule } from './modules/blog/blog.module';
+import { CategoryModule } from './modules/category/category.module';
+import { CommentModule } from './modules/comment/comment.module';
 import { CommonModule } from './modules/common.module';
+import { UserModule } from './modules/users/users.modules';
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import { CommonModule } from './modules/common.module';
     UserModule,
     CategoryModule,
     BlogModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

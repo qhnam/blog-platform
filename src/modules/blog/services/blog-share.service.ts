@@ -19,4 +19,9 @@ export class BlogShareService {
 
     return count > 0;
   }
+
+  async exists(blogId: number) {
+    const count = await this.blogRepository.count({ where: { id: blogId } });
+    return count > 0;
+  }
 }
