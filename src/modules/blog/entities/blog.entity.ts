@@ -5,6 +5,7 @@ import { UserEntity } from 'src/modules/users/entities/users.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -38,6 +39,9 @@ export class BlogEntity {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at' })
+  deletedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.blogs)
   @JoinColumn({ name: 'user_id' })

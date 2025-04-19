@@ -7,6 +7,9 @@ import { CategoryShareService } from 'src/modules/category/services/category-sha
 import { Repository } from 'typeorm';
 import { CreateBlogDto } from '../dtos/create-blog.dto';
 import { BlogEntity } from '../entities/blog.entity';
+import { GetAllBlogDto } from '../dtos/get-all-blog.dto';
+import { title } from 'process';
+import { FILTER_BLOG } from '../enums/filter.enum';
 
 @Injectable()
 export class BlogService {
@@ -61,5 +64,87 @@ export class BlogService {
     await this.blogRepository.save(blogResult);
 
     return blogResult;
+  }
+
+  async deleteBlog(userId: number, id: number) {
+    const blog = await this.blogRepository.findOne({
+      where: {
+        userId,
+        id,
+      },
+    });
+
+    if (!blog) {
+      throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Blog not found');
+    }
+
+    await this.blogRepository.softDelete(id);
+  }
+
+  async findOne(id: number) {
+    const blog = await this.blogRepository
+      .createQueryBuilder('blog')
+      .select([
+        'blog.id',
+        'blog.title',
+        'blog.slug',
+        'blog.createdAt',
+        'blog.updatedAt',
+      ])
+      .leftJoin('blog.user', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .leftJoin('blog.category', 'category')
+      .addSelect(['category.id', 'category.title', 'category.slug'])
+      .getOne();
+
+    if (!blog) {
+      throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Blog not found');
+    }
+
+    return blog;
+  }
+
+  async findAll(
+    dto: GetAllBlogDto,
+  ): Promise<{ data: BlogEntity[]; total: number }> {
+    const query = this.blogRepository
+      .createQueryBuilder('blog')
+      .select([
+        'blog.id',
+        'blog.title',
+        'blog.slug',
+        'blog.createdAt',
+        'blog.updatedAt',
+      ])
+      .leftJoin('blog.user', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .leftJoin('blog.category', 'category')
+      .addSelect(['category.id', 'category.title', 'category.slug']);
+
+    if (dto.search) {
+      query.andWhere('blog.title LIKE :title', { title: `%${dto.search}%` });
+    }
+
+    if (dto.userId) {
+      query.andWhere('user.id = :userId', { userId: dto.userId });
+    }
+
+    if (dto.categoryId) {
+      query.andWhere('category.id = :categoryId', {
+        categoryId: dto.categoryId,
+      });
+    }
+
+    if (!dto.orderBy) {
+      dto.orderBy = FILTER_BLOG.CREATED_AT;
+    }
+
+    const [data, total] = await query
+      .skip(dto.getOffset())
+      .take(dto.limit)
+      .orderBy(`blog.${dto.orderBy}`, dto.sort)
+      .getManyAndCount();
+
+    return { data, total };
   }
 }
