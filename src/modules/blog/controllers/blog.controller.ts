@@ -19,7 +19,7 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { GetAllBlogDto } from '../dtos/get-all-blog.dto';
 import { PaginatedResponse } from 'src/common/response/paginatied.response';
 
-@Controller('blog')
+@Controller('blogs')
 @ApiTags('Blog')
 @ApiBearerAuth()
 @UseGuards(UserGuard)
