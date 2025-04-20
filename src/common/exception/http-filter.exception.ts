@@ -9,14 +9,16 @@ import {
 import { ErrorException } from './error.exception';
 import { Response } from 'express';
 import { ERROR_CODE } from '../enum/error-code.enum';
+import { LogErrorService } from 'src/modules/log-error/services/log-error.service';
 
 @Catch()
 export class HttpFilterException implements ExceptionFilter {
-  constructor() {}
+  constructor(private readonly logErrorService: LogErrorService) {}
 
-  catch(exception: any, host: ArgumentsHost) {
+  async catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let errorException: ErrorException;
 
@@ -42,6 +44,14 @@ export class HttpFilterException implements ExceptionFilter {
         ERROR_CODE.AN_UNKNOWN_ERROR,
         'An unknown error',
       );
+
+      await this.logErrorService.create({
+        errorCode: exception.errorCode,
+        message: exception.message,
+        stackTrade: exception.stack ?? '',
+        path: request?.url,
+        method: request?.method,
+      });
     }
     console.log('e', exception);
     response

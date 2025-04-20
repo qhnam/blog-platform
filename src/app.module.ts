@@ -9,6 +9,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { CommonModule } from './modules/common.module';
 import { UserModule } from './modules/users/users.modules';
+import { LogErrorModule } from './modules/log-error/log-error.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserModule } from './modules/users/users.modules';
     CategoryModule,
     BlogModule,
     CommentModule,
+    LogErrorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

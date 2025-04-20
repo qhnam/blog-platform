@@ -20,7 +20,7 @@ async function bootstrap() {
   app.useGlobalPipes(new CustomPipeValidationException());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
-  app.useGlobalFilters(new HttpFilterException());
+  // app.useGlobalFilters(new HttpFilterException());
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port, '0.0.0.0', () => {

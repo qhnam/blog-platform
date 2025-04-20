@@ -3,4 +3,5 @@ export const DATABASE_NAME = {
   BLOG: 'blog',
   CATEGORY: 'category',
   COMMENT: 'comment',
+  LOG_ERRORS: 'log_errors',
 };
