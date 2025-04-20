@@ -27,6 +27,7 @@ export class BlogService {
         'blog.slug',
         'blog.createdAt',
         'blog.updatedAt',
+        'blog.content',
       ])
       .leftJoin('blog.user', 'user')
       .addSelect(['user.id', 'user.email'])
@@ -47,7 +48,7 @@ export class BlogService {
     blog.userId = userId;
     blog.categoryId = dto.categoryId;
     blog.title = dto.title;
-    blog.text = dto.text;
+    blog.content = dto.content;
 
     const blogResult = await this.blogRepository.save(blog);
     blogResult.slug = `${slugify(dto.title, { lower: true })}-${blogResult.id}`;
@@ -72,7 +73,7 @@ export class BlogService {
 
     blog.categoryId = dto.categoryId;
     blog.title = dto.title;
-    blog.text = dto.text;
+    blog.content = dto.content;
 
     const blogResult = await this.blogRepository.save(blog);
     blogResult.slug = `${slugify(dto.title, { lower: true })}-${blogResult.id}`;

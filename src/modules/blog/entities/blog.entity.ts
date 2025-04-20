@@ -31,8 +31,8 @@ export class BlogEntity {
   @Column({ name: 'slug' })
   slug: string;
 
-  @Column({ name: 'text' })
-  text: string;
+  @Column({ name: 'content' })
+  content: string;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

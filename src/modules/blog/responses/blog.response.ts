@@ -36,6 +36,9 @@ export class BlogResponse {
   updatedAt: Date;
 
   @ApiProperty({})
+  content: string;
+
+  @ApiProperty({})
   user: UserResponse;
 
   @ApiProperty({})
