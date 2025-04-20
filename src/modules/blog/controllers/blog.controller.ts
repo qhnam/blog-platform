@@ -18,6 +18,10 @@ import { SuccessResponse } from 'src/common/response/success.response';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { GetAllBlogDto } from '../dtos/get-all-blog.dto';
 import { PaginatedResponse } from 'src/common/response/paginatied.response';
+import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.decorator';
+import { ApiSuccessNoContentResponse } from 'src/common/response/api-success-no-content.response';
+import { ApiPaginatedResponse } from 'src/common/decorators/api-pagination-response.decorator';
+import { BlogResponse } from '../responses/blog.response';
 
 @Controller('blogs')
 @ApiTags('Blog')
@@ -27,6 +31,7 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post('')
+  @ApiSuccessResponse(BlogResponse)
   async createBlog(@Body() dto: CreateBlogDto, @Req() req: CustomRequest) {
     return SuccessResponse.call(
       await this.blogService.createBlog(req.jwtPayload.id, dto),
@@ -35,6 +40,7 @@ export class BlogController {
   }
 
   @Put(':id')
+  @ApiSuccessResponse(BlogResponse)
   async updateBlog(
     @Param('id') id: number,
     @Body() dto: CreateBlogDto,
@@ -47,6 +53,7 @@ export class BlogController {
   }
 
   @Get(':id')
+  @ApiSuccessResponse(BlogResponse)
   async findOneBlog(@Param('id') id: number) {
     return SuccessResponse.call(
       await this.blogService.findOne(id),
@@ -55,6 +62,7 @@ export class BlogController {
   }
 
   @Get('')
+  @ApiPaginatedResponse(BlogResponse)
   async findAllBlog(@Query() dto: GetAllBlogDto) {
     const { data, total } = await this.blogService.findAll(dto);
 
@@ -69,6 +77,7 @@ export class BlogController {
   }
 
   @Delete(':id')
+  @ApiSuccessResponse(ApiSuccessNoContentResponse)
   async deleteBlog(@Param('id') id: number, @Req() req: CustomRequest) {
     return SuccessResponse.call(
       await this.blogService.deleteBlog(req.jwtPayload.id, id),

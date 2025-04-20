@@ -6,9 +6,8 @@ import { ErrorException } from 'src/common/exception/error.exception';
 import { CategoryShareService } from 'src/modules/category/services/category-share.service';
 import { Repository } from 'typeorm';
 import { CreateBlogDto } from '../dtos/create-blog.dto';
-import { BlogEntity } from '../entities/blog.entity';
 import { GetAllBlogDto } from '../dtos/get-all-blog.dto';
-import { title } from 'process';
+import { BlogEntity } from '../entities/blog.entity';
 import { FILTER_BLOG } from '../enums/filter.enum';
 
 @Injectable()
@@ -18,6 +17,22 @@ export class BlogService {
     private readonly blogRepository: Repository<BlogEntity>,
     private readonly categoryShareService: CategoryShareService,
   ) {}
+
+  private _queryGetBlog(alias: string = 'blog') {
+    return this.blogRepository
+      .createQueryBuilder(alias)
+      .select([
+        'blog.id',
+        'blog.title',
+        'blog.slug',
+        'blog.createdAt',
+        'blog.updatedAt',
+      ])
+      .leftJoin('blog.user', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .leftJoin('blog.category', 'category')
+      .addSelect(['category.id', 'category.title', 'category.slug']);
+  }
 
   async createBlog(userId: number, dto: CreateBlogDto) {
     const category = await this.categoryShareService.findOneByCondition({
@@ -39,16 +54,17 @@ export class BlogService {
 
     await this.blogRepository.save(blogResult);
 
-    return blogResult;
+    return await this._queryGetBlog('blog')
+      .where('blog.id = :id', {
+        id: blogResult.id,
+      })
+      .getOne();
   }
 
   async updateBlog(userId: number, id: number, dto: CreateBlogDto) {
-    const blog = await this.blogRepository.findOne({
-      where: {
-        id,
-        userId,
-      },
-    });
+    const blog = await this._queryGetBlog()
+      .andWhere('blog.id = :id and blog.userId = :userId', { id, userId })
+      .getOne();
 
     if (!blog) {
       throw new ErrorException(ERROR_CODE.NOT_FOUND, 'Blog not found');
@@ -82,19 +98,8 @@ export class BlogService {
   }
 
   async findOne(id: number) {
-    const blog = await this.blogRepository
-      .createQueryBuilder('blog')
-      .select([
-        'blog.id',
-        'blog.title',
-        'blog.slug',
-        'blog.createdAt',
-        'blog.updatedAt',
-      ])
-      .leftJoin('blog.user', 'user')
-      .addSelect(['user.id', 'user.email'])
-      .leftJoin('blog.category', 'category')
-      .addSelect(['category.id', 'category.title', 'category.slug'])
+    const blog = await this._queryGetBlog('blog')
+      .where('blog.id = :id', { id })
       .getOne();
 
     if (!blog) {
@@ -107,19 +112,7 @@ export class BlogService {
   async findAll(
     dto: GetAllBlogDto,
   ): Promise<{ data: BlogEntity[]; total: number }> {
-    const query = this.blogRepository
-      .createQueryBuilder('blog')
-      .select([
-        'blog.id',
-        'blog.title',
-        'blog.slug',
-        'blog.createdAt',
-        'blog.updatedAt',
-      ])
-      .leftJoin('blog.user', 'user')
-      .addSelect(['user.id', 'user.email'])
-      .leftJoin('blog.category', 'category')
-      .addSelect(['category.id', 'category.title', 'category.slug']);
+    const query = this._queryGetBlog('blog');
 
     if (dto.search) {
       query.andWhere('blog.title LIKE :title', { title: `%${dto.search}%` });

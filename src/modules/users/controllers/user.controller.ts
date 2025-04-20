@@ -10,6 +10,7 @@ import { UserService } from '../services/users.service';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { CustomRequest } from 'src/common/guards/guard.const';
 import { UserGuard } from 'src/common/guards/user.guard';
+import { ApiSuccessNoContentResponse } from 'src/common/response/api-success-no-content.response';
 
 @Controller('users')
 @ApiTags('Users')
@@ -37,6 +38,7 @@ export class UserController {
   @Post('change-password')
   @UseGuards(UserGuard)
   @ApiBearerAuth()
+  @ApiSuccessResponse(ApiSuccessNoContentResponse)
   async changePassword(
     @Body() dto: ChangePasswordDto,
     @Req() req: CustomRequest,
