@@ -31,7 +31,7 @@ export class CommentEntity {
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.blogs)
+  @ManyToOne(() => UserEntity, (user) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 

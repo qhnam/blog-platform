@@ -17,14 +17,21 @@ export class CommentService {
     private readonly blogShareService: BlogShareService,
   ) {}
 
+  private _getQueryComment(alias: string = 'comment') {
+    return this.commentRepository
+      .createQueryBuilder('comment')
+      .select(['comment.id', 'comment.content', 'comment.createdAt'])
+      .leftJoin('comment.user', 'user')
+      .addSelect(['user.id', 'user.email']);
+  }
+
   async findAll(
     dto: GetAllCommentDto,
   ): Promise<{ data: CommentEntity[]; total: number }> {
-    const query = this.commentRepository
-      .createQueryBuilder('comment')
-      .where('comment.blogId = :blogId', { blogId: dto.blogId })
-      .leftJoin('comment.user', 'user')
-      .addSelect('user.id', 'user.email');
+    const query = this._getQueryComment('comment').where(
+      'comment.blogId = :blogId',
+      { blogId: dto.blogId },
+    );
 
     const [data, total] = await query
       .skip(dto.getOffset())
@@ -47,7 +54,11 @@ export class CommentService {
     comment.content = dto.content;
     comment.blogId = dto.blogId;
 
-    return await this.commentRepository.save(comment);
+    await this.commentRepository.save(comment);
+
+    return await this._getQueryComment('comment')
+      .where('comment.id = :id', { id: comment.id })
+      .getOne();
   }
 
   async deleteComment(userId: number, id: number) {

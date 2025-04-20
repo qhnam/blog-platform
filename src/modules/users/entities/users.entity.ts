@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { BlogEntity } from 'src/modules/blog/entities/blog.entity';
+import { CommentEntity } from 'src/modules/comment/entities/comment.entity';
 
 @Entity({ name: DATABASE_NAME.USER })
 export class UserEntity {
@@ -29,5 +30,8 @@ export class UserEntity {
   updatedAt: Date;
 
   @OneToMany(() => BlogEntity, (blog) => blog.user)
-  blogs: BlogEntity;
+  blogs: BlogEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
 }

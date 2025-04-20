@@ -15,6 +15,9 @@ import { SuccessResponse } from 'src/common/response/success.response';
 import { CreateCommentDto } from '../dtos/create-comment.dto';
 import { GetAllCommentDto } from '../dtos/get-all-comment.dto';
 import { CommentService } from '../services/comment.service';
+import { ApiPaginatedResponse } from 'src/common/decorators/api-pagination-response.decorator';
+import { CommentResponse } from '../responses/comment.response';
+import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.decorator';
 
 @Controller('comments')
 @ApiTags('Comment')
@@ -24,6 +27,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post('')
+  @ApiSuccessResponse(CommentResponse)
   async createComment(
     @Body() dto: CreateCommentDto,
     @Req() req: CustomRequest,
@@ -35,6 +39,7 @@ export class CommentController {
   }
 
   @Get('')
+  @ApiPaginatedResponse(CommentResponse)
   async findAllComment(@Query() dto: GetAllCommentDto) {
     const { data, total } = await this.commentService.findAll(dto);
     const pagination = new PaginatedResponse({
