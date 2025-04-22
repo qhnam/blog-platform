@@ -11,6 +11,8 @@ import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { CustomRequest } from 'src/common/guards/guard.const';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { ApiSuccessNoContentResponse } from 'src/common/response/api-success-no-content.response';
+import { VerifyEmailDto } from '../dtos/verify-email.dto';
+import { ResendOtpDto } from '../dtos/resend-otp.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -45,5 +47,17 @@ export class UserController {
   ) {
     await this.userService.changePassword(req.jwtPayload.id, dto);
     return SuccessResponse.call(null, 'Change password successfully');
+  }
+
+  @Post('verify/email')
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    await this.userService.verifyEmail(dto);
+    return SuccessResponse.call(null, 'Verify otp successfully');
+  }
+
+  @Post('verify/email/resend-otp')
+  async resendOtpVerifyEmail(@Body() dto: ResendOtpDto) {
+    await this.userService.sendOtp(dto);
+    return SuccessResponse.call(null, 'Send otp successfully');
   }
 }

@@ -1,12 +1,20 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { HttpFilterException } from './common/exception/http-filter.exception';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DataSource } from 'typeorm';
+import {
+  addTransactionalDataSource,
+  initializeTransactionalContext,
+} from 'typeorm-transactional';
+import { AppModule } from './app.module';
 import { CustomPipeValidationException } from './common/exception/custom-pipe-validation.exception';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
+  const dataSource = app.get(DataSource);
+  addTransactionalDataSource(dataSource);
 
   const config = new DocumentBuilder()
     .setTitle('API Documentation')

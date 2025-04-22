@@ -10,6 +10,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { BlogEntity } from 'src/modules/blog/entities/blog.entity';
 import { CommentEntity } from 'src/modules/comment/entities/comment.entity';
+import { USER_STATUS } from '../enums/user-status.enum';
 
 @Entity({ name: DATABASE_NAME.USER })
 export class UserEntity {
@@ -22,6 +23,12 @@ export class UserEntity {
   @Column({ name: 'password' })
   @Exclude()
   password: string;
+
+  @Column({ name: 'fullname' })
+  fullname: string;
+
+  @Column({ name: 'status' })
+  status: USER_STATUS;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

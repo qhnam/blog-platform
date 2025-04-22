@@ -47,7 +47,6 @@ export class BaseFilterDto {
   public getOffset(): number {
     if (!this.page) this.page = 1;
     if (!this.limit) this.limit = 20;
-    console.log('offset', (this.page - 1) * this.limit);
     return (this.page - 1) * this.limit;
   }
 }

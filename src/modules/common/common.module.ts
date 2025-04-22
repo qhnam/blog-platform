@@ -1,7 +1,9 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as redisStore from 'cache-manager-redis-yet';
+import { join } from 'path';
 import { ENVIRONMENT } from 'src/common/const/environment';
 import { BlogEntity } from '../blog/entities/blog.entity';
 import { BlogShareService } from '../blog/services/blog-share.service';
@@ -10,11 +12,23 @@ import { CategoryShareService } from '../category/services/category-share.servic
 import { CommentEntity } from '../comment/entities/comment.entity';
 import { LogErrorEntity } from '../log-error/entities/log-error.entity';
 import { UserEntity } from '../users/entities/users.entity';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { EmailService } from './email/services/email.service';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
+import { MailService } from './mail/services/mail.service';
 import { OtpService } from './otp/services/otp.service';
+import { redisStore } from 'cache-manager-redis-store'; // Lưu ý import này
+import { Cache } from 'cache-manager';
+
+const redisCacheStore: Provider<Cache> = {
+  provide: 'CACHE_REDIS',
+  useFactory: async () => {
+    const store = await redisStore({
+      socket: {
+        host: ENVIRONMENT.REDIS_HOST,
+        port: ENVIRONMENT.REDIS_PORT,
+      },
+    });
+    return store as unknown as Cache;
+  },
+};
 
 const typeormEntities = TypeOrmModule.forFeature([
   UserEntity,
@@ -27,25 +41,16 @@ const typeormEntities = TypeOrmModule.forFeature([
 const providers = [
   CategoryShareService,
   BlogShareService,
-  EmailService,
+  MailService,
   OtpService,
+  redisCacheStore,
 ];
 
 @Module({
   controllers: [],
   providers: providers,
   imports: [
-    CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async () => ({
-        store: await redisStore.redisStore({
-          socket: {
-            host: ENVIRONMENT.REDIS_HOST,
-            port: Number(ENVIRONMENT.REDIS_PORT),
-          },
-        }),
-      }),
-    }),
+    CacheModule.register({}),
     MailerModule.forRoot({
       transport: {
         host: ENVIRONMENT.MAIL_HOST,
@@ -65,9 +70,9 @@ const providers = [
           'dist',
           'modules',
           'common',
-          'email',
+          'mail',
           'templates',
-        ), // dùng path tuyệt đối sau build
+        ),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
