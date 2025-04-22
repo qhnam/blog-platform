@@ -17,6 +17,18 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Build project
+
+```bash
+$ npm run build
+```
+
+## Build template
+
+```bash
+$ npm run copy:templates
+```
+
 ## Run tests
 
 ```bash

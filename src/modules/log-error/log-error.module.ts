@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CommonModule } from '../common.module';
+import { CommonModule } from '../common/common.module';
 import { LogErrorService } from './services/log-error.service';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpFilterException } from 'src/common/exception/http-filter.exception';

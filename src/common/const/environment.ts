@@ -19,4 +19,13 @@ export const ENVIRONMENT = {
   // Redis
   REDIS_HOST: process.env.REDIS_HOST,
   REDIS_PORT: process.env.REDIS_PORT,
+
+  // MAIL
+  MAIL_SERVICE: process.env.MAIL_SERVICE,
+  MAIL_HOST: process.env.MAIL_HOST,
+  MAIL_PORT: process.env.MAIL_PORT,
+  MAIL_SECURE: process.env.MAIL_SECURE === 'true',
+  MAIL_USERNAME: process.env.MAIL_USERNAME,
+  MAIL_SENDER: process.env.MAIL_SENDER,
+  MAIL_PASSWORD: process.env.MAIL_PASSWORD,
 };

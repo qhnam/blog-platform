@@ -46,7 +46,7 @@ export class HttpFilterException implements ExceptionFilter {
       );
 
       await this.logErrorService.create({
-        errorCode: exception.errorCode,
+        errorCode: exception.errorCode ?? '',
         message: exception.message,
         stackTrade: exception.stack ?? '',
         path: request?.url,

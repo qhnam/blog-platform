@@ -7,7 +7,7 @@ import { DATA_SOURCE_OPTION } from './config/data-source-option';
 import { BlogModule } from './modules/blog/blog.module';
 import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
-import { CommonModule } from './modules/common.module';
+import { CommonModule } from './modules/common/common.module';
 import { LogErrorModule } from './modules/log-error/log-error.module';
 import { UserModule } from './modules/users/users.modules';
 

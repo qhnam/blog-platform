@@ -1,6 +1,7 @@
 import { ENVIRONMENT } from 'src/common/const/environment';
+import { DataSourceOptions } from 'typeorm';
 
-export const DATA_SOURCE_OPTION = {
+export const DATA_SOURCE_OPTION: DataSourceOptions = {
   type: ENVIRONMENT.DATABASE_TYPE as any,
   host: ENVIRONMENT.DATABASE_HOST,
   port: Number(ENVIRONMENT.DATABASE_PORT),
