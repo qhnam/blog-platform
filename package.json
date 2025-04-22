@@ -19,8 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:create": "cd src/migrations && typeorm migration:create",
-    "migration:run": "typeorm -d dist/config/ormconfig.js migration:run",
-    "copy:templates": "cpx src/modules/common/mail/templates/**/* dist/modules/common/mail/templates"
+    "migration:run": "typeorm -d dist/config/ormconfig.js migration:run"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
