@@ -22,7 +22,10 @@
     "migration:run": "typeorm -d dist/config/ormconfig.js migration:run"
   },
   "dependencies": {
+    "@bull-board/api": "^6.9.2",
+    "@bull-board/express": "^6.9.2",
     "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs/bull": "^11.0.2",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -34,6 +37,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
+    "bull": "^4.16.5",
     "cache-manager": "^6.4.2",
     "cache-manager-redis-store": "^3.0.1",
     "cache-manager-redis-yet": "^5.1.5",

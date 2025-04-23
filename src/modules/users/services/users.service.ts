@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { ErrorException } from 'src/common/exception/error.exception';
@@ -19,6 +19,7 @@ import { LoginResponse } from '../responses/login.response';
 import { RegisterResponse } from '../responses/register.response';
 import { AuthService } from './auth.service';
 import { ResendOtpDto } from '../dtos/resend-otp.dto';
+import { JwtPayload } from 'src/common/guards/guard.const';
 
 @Injectable()
 export class UserService {
@@ -172,5 +173,9 @@ export class UserService {
         otp: otp,
       },
     });
+  }
+
+  async refreshToken(refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
   }
 }

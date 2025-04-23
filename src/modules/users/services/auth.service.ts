@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../entities/users.entity';
 import { ENVIRONMENT } from 'src/common/const/environment';
+import { JwtPayload } from 'src/common/guards/guard.const';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  public async verifyRefreshToken(token: string) {
+  public async verifyRefreshToken(token: string): Promise<JwtPayload> {
     return await this.jwtService.verify(token, {
       secret: ENVIRONMENT.JWT_REFRESH_SECRET,
     });
@@ -34,7 +35,7 @@ export class AuthService {
     if (!payload) return null;
 
     const accessToken = this.generateAccessToken({
-      id: payload.sub,
+      id: payload.id,
       email: payload.email,
     } as UserEntity);
 

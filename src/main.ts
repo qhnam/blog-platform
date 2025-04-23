@@ -8,11 +8,15 @@ import {
 } from 'typeorm-transactional';
 import { AppModule } from './app.module';
 import { CustomPipeValidationException } from './common/exception/custom-pipe-validation.exception';
+import { Queue } from 'bull';
+import { getQueueToken } from '@nestjs/bull';
+import { createBullBoardUI } from './modules/common/queue/bull-board';
 
 async function bootstrap() {
   initializeTransactionalContext();
 
   const app = await NestFactory.create(AppModule);
+
   const dataSource = app.get(DataSource);
   addTransactionalDataSource(dataSource);
 
@@ -29,6 +33,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   // app.useGlobalFilters(new HttpFilterException());
+
+  const bullBoardAdapter = createBullBoardUI([]);
+  app.use('/admin/queues', bullBoardAdapter.getRouter());
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port, '0.0.0.0', () => {

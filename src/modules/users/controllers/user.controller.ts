@@ -13,6 +13,7 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import { ApiSuccessNoContentResponse } from 'src/common/response/api-success-no-content.response';
 import { VerifyEmailDto } from '../dtos/verify-email.dto';
 import { ResendOtpDto } from '../dtos/resend-otp.dto';
+import { RefreshTokenDto } from '../dtos/refresh-token.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -59,5 +60,13 @@ export class UserController {
   async resendOtpVerifyEmail(@Body() dto: ResendOtpDto) {
     await this.userService.sendOtp(dto);
     return SuccessResponse.call(null, 'Send otp successfully');
+  }
+
+  @Post('refreshToken')
+  async refreshToke(@Body() dto: RefreshTokenDto) {
+    return SuccessResponse.call(
+      await this.userService.refreshToken(dto.refreshToken),
+      'Refresh token successfully',
+    );
   }
 }
