@@ -1,9 +1,8 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { CacheModule } from '@nestjs/cache-manager';
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
+import { Cache } from 'cache-manager';
+import * as redisStore from 'cache-manager-redis-yet';
 import { ENVIRONMENT } from 'src/common/const/environment';
 import { BlogEntity } from '../blog/entities/blog.entity';
 import { BlogShareService } from '../blog/services/blog-share.service';
@@ -14,18 +13,18 @@ import { LogErrorEntity } from '../log-error/entities/log-error.entity';
 import { UserEntity } from '../users/entities/users.entity';
 import { MailService } from './mail/services/mail.service';
 import { OtpService } from './otp/services/otp.service';
-import { redisStore } from 'cache-manager-redis-store'; // Lưu ý import này
-import { Cache } from 'cache-manager';
 
-const redisCacheStore: Provider<Cache> = {
+export const redisCacheStore: Provider<Cache> = {
   provide: 'CACHE_REDIS',
-  useFactory: async () => {
-    const store = await redisStore({
+  useFactory: async (): Promise<Cache> => {
+    const store = await redisStore.redisStore({
       socket: {
-        host: ENVIRONMENT.REDIS_HOST,
-        port: ENVIRONMENT.REDIS_PORT,
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379,
       },
+      ttl: 60,
     });
+
     return store as unknown as Cache;
   },
 };
@@ -50,7 +49,8 @@ const providers = [
   controllers: [],
   providers: providers,
   imports: [
-    CacheModule.register({}),
+    // CacheModule.register({}),
+
     MailerModule.forRoot({
       transport: {
         host: ENVIRONMENT.MAIL_HOST,
@@ -64,23 +64,9 @@ const providers = [
       defaults: {
         from: `"No Reply" <${ENVIRONMENT.MAIL_SENDER}>`,
       },
-      template: {
-        dir: join(
-          process.cwd(),
-          'dist',
-          'modules',
-          'common',
-          'mail',
-          'templates',
-        ),
-        adapter: new HandlebarsAdapter(),
-        options: {
-          strict: true,
-        },
-      },
     }),
     typeormEntities,
   ],
-  exports: [typeormEntities, ...providers],
+  exports: [typeormEntities, ...providers, redisCacheStore],
 })
 export class CommonModule {}

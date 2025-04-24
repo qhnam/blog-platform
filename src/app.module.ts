@@ -10,6 +10,7 @@ import { CommentModule } from './modules/comment/comment.module';
 import { CommonModule } from './modules/common/common.module';
 import { LogErrorModule } from './modules/log-error/log-error.module';
 import { UserModule } from './modules/users/users.modules';
+import { QueueModule } from './modules/common/queue/queue.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './modules/users/users.modules';
       global: true,
     }),
     CommonModule,
+    QueueModule,
     UserModule,
     CategoryModule,
     BlogModule,

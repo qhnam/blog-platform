@@ -20,6 +20,8 @@ import { RegisterResponse } from '../responses/register.response';
 import { AuthService } from './auth.service';
 import { ResendOtpDto } from '../dtos/resend-otp.dto';
 import { JwtPayload } from 'src/common/guards/guard.const';
+import { EmailProcessor } from '../processors/email.processor';
+import { QueueService } from 'src/modules/common/queue/services/queue.service';
 
 @Injectable()
 export class UserService {
@@ -29,6 +31,7 @@ export class UserService {
     private readonly authService: AuthService,
     private readonly otpService: OtpService,
     private readonly mailService: MailService,
+    private readonly queueService: QueueService,
   ) {}
 
   @Transactional()
@@ -68,8 +71,7 @@ export class UserService {
       OTP_TYPE.EMAIL_VERIFY,
     );
 
-    // TODO add to queue for processing
-    await this.mailService.sendMail({
+    await this.queueService.addSendEmailJob({
       to: newUser.email,
       type: EMAIL_TYPE.EMAIL_VERIFY,
       data: {

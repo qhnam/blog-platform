@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { Utils } from 'src/common/utils';
 import { OTP_TTL_CONST, OTP_TTL_COOL_DOWN_CONST } from '../constant';
@@ -8,7 +8,12 @@ import { OTP_ERROR_CODE } from '../enums/otp-error';
 
 @Injectable()
 export class OtpService {
-  constructor(@Inject('CACHE_REDIS') private readonly cacheManager: Cache) {}
+  constructor(@Inject('CACHE_REDIS') private readonly cacheManager: Cache) {
+    console.log(
+      'redis',
+      this.cacheManager.ttl('otp:email-verify:xof1al1ep129113@lushosa.com'),
+    );
+  }
 
   private _generateKey(identifier: string, otpType: OTP_TYPE) {
     return `otp:${otpType}:${identifier}`;
@@ -31,7 +36,7 @@ export class OtpService {
       const existingCoolDown = await this.cacheManager.get(
         this._generateCoolDownKey(identifier, otpType),
       );
-
+      console.log('existingCoolDown', existingCoolDown);
       if (existingCoolDown) {
         throw new ErrorException(
           OTP_ERROR_CODE.REQUEST_OTP_TOO_QUICKLY,
@@ -46,18 +51,30 @@ export class OtpService {
 
     const otp = Utils.generateRandomNumber(6);
 
-    await Promise.all([
-      this.cacheManager.set(
-        this._generateKey(identifier, otpType),
-        otp,
-        OTP_TTL_CONST,
-      ),
-      this.cacheManager.set(
-        this._generateCoolDownKey(identifier, otpType),
-        '1',
-        OTP_TTL_COOL_DOWN_CONST,
-      ),
-    ]);
+    await this.cacheManager.set(
+      this._generateKey(identifier, otpType),
+      otp,
+      OTP_TTL_CONST,
+    );
+
+    await this.cacheManager.set(
+      this._generateCoolDownKey(identifier, otpType),
+      '1',
+      OTP_TTL_COOL_DOWN_CONST,
+    );
+
+    // await Promise.all([
+    //   this.cacheManager.set(
+    //     this._generateKey(identifier, otpType),
+    //     otp,
+    //     OTP_TTL_CONST,
+    //   ),
+    //   this.cacheManager.set(
+    //     this._generateCoolDownKey(identifier, otpType),
+    //     '1',
+    //     OTP_TTL_COOL_DOWN_CONST,
+    //   ),
+    // ]);
 
     return otp;
   }
