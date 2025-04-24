@@ -28,4 +28,7 @@ export const ENVIRONMENT = {
   MAIL_USERNAME: process.env.MAIL_USERNAME,
   MAIL_SENDER: process.env.MAIL_SENDER,
   MAIL_PASSWORD: process.env.MAIL_PASSWORD,
+
+  BULL_BOARD_USER: process.env.BULL_BOARD_USER,
+  BULL_BOARD_PASS: process.env.BULL_BOARD_PASS,
 };
