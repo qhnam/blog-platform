@@ -3,10 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../entities/users.entity';
 import { ENVIRONMENT } from 'src/common/const/environment';
 import { JwtPayload } from 'src/common/guards/guard.const';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
   public generateAccessToken(user: UserEntity) {
     const payload = { email: user.email, id: user.id };
 

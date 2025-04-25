@@ -9,6 +9,7 @@ export class EmailProcessor {
 
   @Process(QUEUE_PROCESS.EMAIL_PROCESS)
   async handleSendMail(data: ISendMailInput) {
-    // await this.mailService.sendMail(data);
+    console.log('send mail', { data });
+    await this.mailService.sendMail(data);
   }
 }

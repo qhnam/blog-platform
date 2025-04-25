@@ -11,9 +11,10 @@ import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { CustomRequest } from 'src/common/guards/guard.const';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { ApiSuccessNoContentResponse } from 'src/common/response/api-success-no-content.response';
-import { VerifyEmailDto } from '../dtos/verify-email.dto';
 import { ResendOtpDto } from '../dtos/resend-otp.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
+import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
+import { VerifyOtpDto } from '../dtos/verify-otp.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -51,7 +52,7 @@ export class UserController {
   }
 
   @Post('verify/email')
-  async verifyEmail(@Body() dto: VerifyEmailDto) {
+  async verifyEmail(@Body() dto: VerifyOtpDto) {
     await this.userService.verifyEmail(dto);
     return SuccessResponse.call(null, 'Verify otp successfully');
   }
@@ -68,5 +69,11 @@ export class UserController {
       await this.userService.refreshToken(dto.refreshToken),
       'Refresh token successfully',
     );
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.userService.forgotPassword(dto.email);
+    return SuccessResponse.call(null, 'Send otp forgot password successfully');
   }
 }

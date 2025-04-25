@@ -36,7 +36,7 @@ export class OtpService {
       const existingCoolDown = await this.cacheManager.get(
         this._generateCoolDownKey(identifier, otpType),
       );
-      console.log('existingCoolDown', existingCoolDown);
+
       if (existingCoolDown) {
         throw new ErrorException(
           OTP_ERROR_CODE.REQUEST_OTP_TOO_QUICKLY,
@@ -51,30 +51,18 @@ export class OtpService {
 
     const otp = Utils.generateRandomNumber(6);
 
-    await this.cacheManager.set(
-      this._generateKey(identifier, otpType),
-      otp,
-      OTP_TTL_CONST,
-    );
-
-    await this.cacheManager.set(
-      this._generateCoolDownKey(identifier, otpType),
-      '1',
-      OTP_TTL_COOL_DOWN_CONST,
-    );
-
-    // await Promise.all([
-    //   this.cacheManager.set(
-    //     this._generateKey(identifier, otpType),
-    //     otp,
-    //     OTP_TTL_CONST,
-    //   ),
-    //   this.cacheManager.set(
-    //     this._generateCoolDownKey(identifier, otpType),
-    //     '1',
-    //     OTP_TTL_COOL_DOWN_CONST,
-    //   ),
-    // ]);
+    await Promise.all([
+      this.cacheManager.set(
+        this._generateKey(identifier, otpType),
+        otp,
+        OTP_TTL_CONST,
+      ),
+      this.cacheManager.set(
+        this._generateCoolDownKey(identifier, otpType),
+        '1',
+        OTP_TTL_COOL_DOWN_CONST,
+      ),
+    ]);
 
     return otp;
   }
@@ -111,8 +99,10 @@ export class OtpService {
       throw new ErrorException(OTP_ERROR_CODE.OTP_INVALID, 'Otp invalid');
     }
 
-    await this.cacheManager.del(this._generateKey(identifier, otpType));
-    await this.cacheManager.del(this._generateRetryKey(identifier, otpType));
+    await Promise.all([
+      this.cacheManager.del(this._generateKey(identifier, otpType)),
+      this.cacheManager.del(this._generateRetryKey(identifier, otpType)),
+    ]);
 
     return true;
   }

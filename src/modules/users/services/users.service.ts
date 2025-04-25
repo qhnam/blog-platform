@@ -1,27 +1,28 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { ErrorException } from 'src/common/exception/error.exception';
 import { EMAIL_TYPE } from 'src/modules/common/mail/enums';
 import { MailService } from 'src/modules/common/mail/services/mail.service';
 import { OtpService } from 'src/modules/common/otp/services/otp.service';
+import { QueueService } from 'src/modules/common/queue/services/queue.service';
 import { OTP_TYPE } from 'src/modules/enums/otp-type.enum';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginUserDto } from '../dtos/login-user.dto';
-import { VerifyEmailDto } from '../dtos/verify-email.dto';
+import { ResendOtpDto } from '../dtos/resend-otp.dto';
 import { UserEntity } from '../entities/users.entity';
 import { USER_ERROR_ENUM } from '../enums/user-error.enum';
 import { USER_STATUS } from '../enums/user-status.enum';
 import { LoginResponse } from '../responses/login.response';
 import { RegisterResponse } from '../responses/register.response';
 import { AuthService } from './auth.service';
-import { ResendOtpDto } from '../dtos/resend-otp.dto';
-import { JwtPayload } from 'src/common/guards/guard.const';
-import { EmailProcessor } from '../processors/email.processor';
-import { QueueService } from 'src/modules/common/queue/services/queue.service';
+import { VerifyOtpDto } from '../dtos/verify-otp.dto';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { OTP_ERROR_CODE } from 'src/modules/common/otp/enums/otp-error';
+import { TEmailVerify } from 'src/modules/common/mail/types';
 
 @Injectable()
 export class UserService {
@@ -141,8 +142,8 @@ export class UserService {
     await this.userRepo.save(user);
   }
 
-  async verifyEmail(dto: VerifyEmailDto) {
-    await this.otpService.verifyOtp(dto.email, dto.opt, OTP_TYPE.EMAIL_VERIFY);
+  async verifyEmail(dto: VerifyOtpDto) {
+    await this.otpService.verifyOtp(dto.email, dto.otp, OTP_TYPE.EMAIL_VERIFY);
 
     const user = await this.userRepo.findOne({ where: { email: dto.email } });
     if (!user) {
@@ -179,5 +180,42 @@ export class UserService {
 
   async refreshToken(refreshToken: string) {
     return this.authService.refreshToken(refreshToken);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepo.findOne({ where: { email } });
+
+    if (!user) return;
+
+    const otp = await this.otpService.generateOtp(
+      email,
+      OTP_TYPE.FORGOT_PASSWORD,
+    );
+
+    await this.queueService.addSendEmailJob({
+      to: user.email,
+      type: EMAIL_TYPE.FORGOT_PASSWORD,
+      data: {
+        otp: otp,
+        fullname: user.fullname,
+      },
+    });
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    await this.otpService.verifyOtp(
+      dto.email,
+      dto.otp,
+      OTP_TYPE.FORGOT_PASSWORD,
+    );
+
+    const user = await this.userRepo.findOne({ where: { email: dto.email } });
+    if (!user) {
+      throw new ErrorException(OTP_ERROR_CODE.OTP_INVALID, 'Otp invalid');
+    }
+
+    user.password = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.userRepo.save(user);
   }
 }

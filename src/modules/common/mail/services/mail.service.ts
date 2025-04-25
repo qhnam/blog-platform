@@ -28,6 +28,13 @@ export class MailService {
           html: MailTemplate.verifyMail(dataEmail),
         };
       }
+      case EMAIL_TYPE.FORGOT_PASSWORD: {
+        const dataEmail = data.data as TEmailVerify;
+        return {
+          subject: 'Forgot password',
+          html: MailTemplate.forgotPassword(dataEmail),
+        };
+      }
     }
   }
 }
