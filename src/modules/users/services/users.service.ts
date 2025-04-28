@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { ErrorException } from 'src/common/exception/error.exception';
 import { EMAIL_TYPE } from 'src/modules/common/mail/enums';
 import { MailService } from 'src/modules/common/mail/services/mail.service';
+import { OTP_ERROR_CODE } from 'src/modules/common/otp/enums/otp-error';
 import { OtpService } from 'src/modules/common/otp/services/otp.service';
 import { QueueService } from 'src/modules/common/queue/services/queue.service';
 import { OTP_TYPE } from 'src/modules/enums/otp-type.enum';
@@ -13,16 +14,14 @@ import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { ResendOtpDto } from '../dtos/resend-otp.dto';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { VerifyOtpDto } from '../dtos/verify-otp.dto';
 import { UserEntity } from '../entities/users.entity';
 import { USER_ERROR_ENUM } from '../enums/user-error.enum';
 import { USER_STATUS } from '../enums/user-status.enum';
 import { LoginResponse } from '../responses/login.response';
 import { RegisterResponse } from '../responses/register.response';
 import { AuthService } from './auth.service';
-import { VerifyOtpDto } from '../dtos/verify-otp.dto';
-import { ResetPasswordDto } from '../dtos/reset-password.dto';
-import { OTP_ERROR_CODE } from 'src/modules/common/otp/enums/otp-error';
-import { TEmailVerify } from 'src/modules/common/mail/types';
 
 @Injectable()
 export class UserService {
