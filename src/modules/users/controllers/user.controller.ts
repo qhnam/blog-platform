@@ -15,6 +15,7 @@ import { ResendOtpDto } from '../dtos/resend-otp.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
 import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { VerifyOtpDto } from '../dtos/verify-otp.dto';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -76,4 +77,7 @@ export class UserController {
     await this.userService.forgotPassword(dto.email);
     return SuccessResponse.call(null, 'Send otp forgot password successfully');
   }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {}
 }

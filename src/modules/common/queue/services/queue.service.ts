@@ -11,8 +11,8 @@ export class QueueService {
     private readonly emailQueue: Queue,
   ) {}
 
-  async addSendEmailJob(data: Job<ISendMailInput>) {
-    await this.emailQueue.add(QUEUE_PROCESS.EMAIL_PROCESS, data.data, {
+  async addSendEmailJob(data: ISendMailInput) {
+    await this.emailQueue.add(QUEUE_PROCESS.EMAIL_PROCESS, data, {
       delay: 6000,
       attempts: 3,
       backoff: 3000,
